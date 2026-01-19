@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    /* Latar Belakang Sidebar */
+    .bg-sidebar { 
+        background-color: #15192b; 
+    }
+
+    /* Menu Header Aktif (Kotak Ungu Gradient) */
+    .menu-header-active {
+        @apply bg-gradient-to-r from-violet-600 to-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-500/30;
+    }
+
+    /* ITEM AKTIF (Fluid/Liquid Effect) */
+    .fluid-active {
+        background-color: #23273c; /* Warna background item saat aktif */
+        @apply text-indigo-400 font-bold relative rounded-l-full;
+    }
+
+    /* Lengkungan ATAS (Inverted Radius Top) */
+    .fluid-active::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        background: transparent;
+        border-bottom-right-radius: 20px;
+        box-shadow: 4px 4px 0 0 #23273c; /* Warna bayangan = Warna background item aktif */
+        pointer-events: none;
+    }
+
+    /* Lengkungan BAWAH (Inverted Radius Bottom) */
+    .fluid-active::after {
+        content: '';
+        position: absolute;
+        bottom: -20px;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        background: transparent;
+        border-top-right-radius: 20px;
+        box-shadow: 4px -4px 0 0 #23273c;
+        pointer-events: none;
+    }
+}

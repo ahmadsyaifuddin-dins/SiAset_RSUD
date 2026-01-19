@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Jika nanti butuh manajemen user lain
+    Route::resource('users', UserController::class);
     Route::get('users', [UserController::class, 'index'])->name('users.index');
 
     // --- 2. MASTER DATA (Sidebar: Master Data) ---

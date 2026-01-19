@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreRuanganRequest;
+use App\Http\Requests\UpdateRuanganRequest;
 use App\Models\Ruangan;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File; // Penting buat hapus file lama
 
 class RuanganController extends Controller
 {
     public function index()
     {
-        // Ambil semua data ruangan, urutkan dari yang terbaru
         $ruangans = Ruangan::latest()->get();
 
         return view('master.ruangan.index', compact('ruangans'));
@@ -20,17 +21,26 @@ class RuanganController extends Controller
         return view('master.ruangan.create');
     }
 
-    public function store(Request $request)
+    // Pakai Custom Request untuk Validasi
+    public function store(StoreRuanganRequest $request)
     {
-        $request->validate([
-            'nama_ruangan' => 'required|string|max:255',
-            'kepala_ruangan' => 'nullable|string|max:255',
-        ]);
+        $data = $request->validated();
 
-        Ruangan::create($request->all());
+        // LOGIC OLD SCHOOL UPLOAD
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            // Nama file unik: time + nama asli
+            $filename = time().'_'.$file->getClientOriginalName();
 
-        // Redirect dengan pesan sukses (nanti ditangkap SweetAlert)
-        return redirect()->route('ruangan.index')->with('success', 'Ruangan berhasil ditambahkan!');
+            // Pindah langsung ke public/uploads/ruangan
+            $file->move(public_path('uploads/ruangan'), $filename);
+
+            $data['foto'] = 'ruangan/'.$filename; // Simpan path relatif
+        }
+
+        Ruangan::create($data);
+
+        return redirect()->route('ruangan.index')->with('success', 'Ruangan berhasil dibuat!');
     }
 
     public function edit(Ruangan $ruangan)
@@ -38,27 +48,38 @@ class RuanganController extends Controller
         return view('master.ruangan.edit', compact('ruangan'));
     }
 
-    public function update(Request $request, Ruangan $ruangan)
+    public function update(UpdateRuanganRequest $request, Ruangan $ruangan)
     {
-        $request->validate([
-            'nama_ruangan' => 'required|string|max:255',
-            'kepala_ruangan' => 'nullable|string|max:255',
-        ]);
+        $data = $request->validated();
 
-        $ruangan->update($request->all());
+        if ($request->hasFile('foto')) {
+            // 1. Hapus file lama jika ada (Biar gak nyampah)
+            if ($ruangan->foto && File::exists(public_path('uploads/'.$ruangan->foto))) {
+                File::delete(public_path('uploads/'.$ruangan->foto));
+            }
 
-        return redirect()->route('ruangan.index')->with('success', 'Data Ruangan diperbarui!');
+            // 2. Upload file baru
+            $file = $request->file('foto');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('uploads/ruangan'), $filename);
+
+            $data['foto'] = 'ruangan/'.$filename;
+        }
+
+        $ruangan->update($data);
+
+        return redirect()->route('ruangan.index')->with('success', 'Ruangan berhasil diperbarui!');
     }
 
     public function destroy(Ruangan $ruangan)
     {
-        try {
-            $ruangan->delete();
-
-            return redirect()->route('ruangan.index')->with('success', 'Ruangan dihapus!');
-        } catch (\Exception $e) {
-            // Error handling kalau ruangan masih punya inventaris (Relasi Foreign Key)
-            return redirect()->back()->with('error', 'Gagal hapus! Ruangan ini masih memiliki Aset/Inventaris.');
+        // Hapus foto fisik sebelum hapus data
+        if ($ruangan->foto && File::exists(public_path('uploads/'.$ruangan->foto))) {
+            File::delete(public_path('uploads/'.$ruangan->foto));
         }
+
+        $ruangan->delete();
+
+        return redirect()->route('ruangan.index')->with('success', 'Ruangan dihapus!');
     }
 }
