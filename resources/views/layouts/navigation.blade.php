@@ -96,23 +96,29 @@
             </button>
 
             <div x-show="open" x-collapse class="mt-2 ml-4 pl-0 border-l-2 border-gray-700 space-y-1">
+
                 <div class="relative pl-2">
-                    <a href="#"
-                        class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium text-gray-400 hover:text-gray-200">
+                    <a href="{{ route('gudang.stok') }}"
+                        class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium
+               {{ request()->routeIs('gudang.stok') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
                         <span class="w-6"><i class="fa-solid fa-layer-group"></i></span>
                         <span>Stok Gudang</span>
                     </a>
                 </div>
+
                 <div class="relative pl-2">
-                    <a href="#"
-                        class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium text-gray-400 hover:text-gray-200">
+                    <a href="{{ route('gudang-masuk.index') }}"
+                        class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium
+               {{ request()->routeIs('gudang-masuk.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
                         <span class="w-6"><i class="fa-solid fa-download"></i></span>
                         <span>Barang Masuk</span>
                     </a>
                 </div>
+
                 <div class="relative pl-2">
-                    <a href="#"
-                        class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium text-gray-400 hover:text-gray-200">
+                    <a href="{{ route('gudang-keluar.index') }}"
+                        class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium
+               {{ request()->routeIs('gudang-keluar.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
                         <span class="w-6"><i class="fa-solid fa-upload"></i></span>
                         <span>Barang Keluar</span>
                     </a>

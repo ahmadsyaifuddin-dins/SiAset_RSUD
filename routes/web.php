@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangGudangController;
+use App\Http\Controllers\GudangKeluarController;
+use App\Http\Controllers\GudangMasukController;
 use App\Http\Controllers\InventarisController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RuanganController;
@@ -53,14 +55,28 @@ Route::middleware('auth')->group(function () {
     Route::resource('inventaris', InventarisController::class)->parameters([
         'inventaris' => 'inventaris',
     ]);
-    // --- 4. GUDANG (Sidebar: Gudang) ---
-    Route::prefix('gudang')->group(function () {
-        // Stok Gudang (Lihat sisa stok) - Sebenarnya bisa pakai index-nya BarangGudangController
-        // Route::get('stok', [BarangGudangController::class, 'index'])->name('gudang.stok');
 
-        // Transaksi Masuk & Keluar
-        // Route::resource('masuk', GudangMasukController::class);
-        // Route::resource('keluar', GudangKeluarController::class);
+    // 4. GUDANG
+    Route::prefix('gudang')->group(function () {
+
+        // Menu Stok Gudang (Re-use dari Master Barang Gudang)
+        Route::get('stok', [BarangGudangController::class, 'index'])->name('gudang.stok');
+
+        // Transaksi Masuk
+        Route::resource('masuk', GudangMasukController::class)->names([
+            'index' => 'gudang-masuk.index',
+            'create' => 'gudang-masuk.create',
+            'store' => 'gudang-masuk.store',
+            'destroy' => 'gudang-masuk.destroy',
+        ]);
+
+        // Transaksi Keluar
+        Route::resource('keluar', GudangKeluarController::class)->names([
+            'index' => 'gudang-keluar.index',
+            'create' => 'gudang-keluar.create',
+            'store' => 'gudang-keluar.store',
+            'destroy' => 'gudang-keluar.destroy',
+        ]);
     });
 
     // --- 5. PERBAIKAN / MAINTENANCE (Sidebar: Perbaikan) ---
