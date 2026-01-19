@@ -7,6 +7,7 @@ use App\Http\Controllers\GudangKeluarController;
 use App\Http\Controllers\GudangMasukController;
 use App\Http\Controllers\InventarisController;
 use App\Http\Controllers\KerusakanController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RuanganController;
@@ -109,7 +110,16 @@ Route::middleware('auth')->group(function () {
     ]);
 
     // Laporan (Sidebar: Laporan)
-    // Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::prefix('laporan')->group(function () {
+        Route::get('/', [LaporanController::class, 'index'])->name('laporan.index');
+
+        // Route untuk Cetak PDF
+        Route::get('/inventaris', [LaporanController::class, 'inventaris'])->name('laporan.inventaris');
+        Route::get('/stok', [LaporanController::class, 'stokGudang'])->name('laporan.stok');
+        Route::get('/masuk', [LaporanController::class, 'barangMasuk'])->name('laporan.masuk');
+        Route::get('/keluar', [LaporanController::class, 'barangKeluar'])->name('laporan.keluar');
+        Route::get('/perbaikan', [LaporanController::class, 'perbaikan'])->name('laporan.perbaikan');
+    });
 });
 
 require __DIR__.'/auth.php';

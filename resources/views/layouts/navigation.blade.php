@@ -171,8 +171,9 @@
                 <span class="mx-1 text-sm font-medium">Barang Rusak Berat</span>
             </a>
 
-            <a href="#"
-                class="flex items-center w-full py-3 px-4 rounded-xl transition-all duration-200 text-gray-400 hover:text-white">
+            <a href="{{ route('laporan.index') }}"
+                class="flex items-center w-full py-3 px-4 rounded-xl transition-all duration-200 text-gray-400 hover:text-white
+                {{ request()->routeIs('laporan.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
                 <span class="w-8"><i class="fa-solid fa-file-contract text-lg"></i></span>
                 <span class="mx-1 text-sm font-medium">Laporan</span>
             </a>
