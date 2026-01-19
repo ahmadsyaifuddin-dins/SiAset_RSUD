@@ -7,8 +7,8 @@
     <div class="flex items-center justify-center mt-8 pb-6">
         <div class="flex flex-col items-center gap-2">
             <div
-                class="bg-white p-1 rounded-full h-16 w-16 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                <i class="fa-solid fa-hospital text-indigo-600 text-3xl"></i>
+                class="bg-white p-2 rounded-full h-20 w-20 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <img src="{{ asset('logo/logo.png') }}" alt="Logo RSUD" class="w-full h-full object-contain">
             </div>
             <span class="text-white text-lg font-bold tracking-wider mt-2">RSUD HBK</span>
         </div>
@@ -21,7 +21,7 @@
                 class="flex items-center w-full py-3 px-4 rounded-xl transition-all duration-200 
                {{ request()->routeIs('dashboard') ? 'menu-header-active' : 'text-gray-400 hover:text-white' }}">
                 <span class="w-8"><i class="fa-solid fa-gauge-high text-lg"></i></span>
-                <span class="mx-1 text-sm font-medium">Dashboard System</span>
+                <span class="mx-1 text-sm font-medium">Dashboard</span>
             </a>
         </div>
 
