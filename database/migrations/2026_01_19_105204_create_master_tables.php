@@ -6,22 +6,41 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('master_tables', function (Blueprint $table) {
+        // 1. Master Ruangan
+        Schema::create('ruangan', function (Blueprint $table) {
             $table->id();
+            $table->string('nama_ruangan'); // Cth: IGD, Poli Anak
+            $table->string('kepala_ruangan')->nullable();
+            $table->timestamps();
+        });
+
+        // 2. Master Barang Aset (Laptop, Printer, Meja)
+        Schema::create('barang', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_barang');
+            $table->string('sn')->nullable()->unique(); // REQUEST ANGRI: Serial Number
+            $table->string('jenis_barang'); // Elektronik, Medis, Mebel
+            $table->string('kategori_barang'); // Kategori tambahan
+            $table->text('keterangan')->nullable();
+            $table->timestamps();
+        });
+
+        // 3. Master Barang Gudang (Kertas, Tinta, Spidol) - REQUEST DOSPEM
+        Schema::create('barang_gudang', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_barang');
+            $table->string('satuan'); // Rim, Box, Pcs
+            $table->integer('stok_saat_ini')->default(0); // Update otomatis via Observer
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('master_tables');
+        Schema::dropIfExists('barang_gudang');
+        Schema::dropIfExists('barang');
+        Schema::dropIfExists('ruangan');
     }
 };
