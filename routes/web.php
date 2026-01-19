@@ -5,6 +5,8 @@ use App\Http\Controllers\BarangGudangController;
 use App\Http\Controllers\GudangKeluarController;
 use App\Http\Controllers\GudangMasukController;
 use App\Http\Controllers\InventarisController;
+use App\Http\Controllers\KerusakanController;
+use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\UserController;
@@ -79,13 +81,13 @@ Route::middleware('auth')->group(function () {
         ]);
     });
 
-    // --- 5. PERBAIKAN / MAINTENANCE (Sidebar: Perbaikan) ---
+    // 5. PERBAIKAN / MAINTENANCE (Sidebar: Perbaikan)
     Route::prefix('perbaikan')->group(function () {
         // Permintaan Perbaikan (Lapor Kerusakan)
-        // Route::resource('kerusakan', KerusakanController::class);
+        Route::resource('kerusakan', KerusakanController::class);
 
         // Tindakan Perbaikan (Teknisi Eksekusi)
-        // Route::resource('tindakan', PerbaikanController::class);
+        Route::resource('tindakan', PerbaikanController::class);
     });
 
     // --- 6. SERAH TERIMA & BARANG RUSAK (Sidebar: Bawah) ---

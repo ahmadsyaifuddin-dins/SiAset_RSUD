@@ -138,15 +138,17 @@
 
             <div x-show="open" x-collapse class="mt-2 ml-4 pl-0 border-l-2 border-gray-700 space-y-1">
                 <div class="relative pl-2">
-                    <a href="#"
-                        class="flex items-center py-3 pl-4 pr-4 text-gray-400 hover:text-gray-200 transition-all duration-200 text-sm font-medium">
+                    <a href="{{ route('kerusakan.index') }}"
+                        class="flex items-center py-3 pl-4 pr-4 text-gray-400 hover:text-gray-200 transition-all duration-200 text-sm font-medium
+                        {{ request()->routeIs('kerusakan.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
                         <span class="w-6"><i class="fa-solid fa-rotate"></i></span>
                         <span>Permintaan</span>
                     </a>
                 </div>
                 <div class="relative pl-2">
-                    <a href="#"
-                        class="flex items-center py-3 pl-4 pr-4 text-gray-400 hover:text-gray-200 transition-all duration-200 text-sm font-medium">
+                    <a href="{{ route('tindakan.index') }}"
+                        class="flex items-center py-3 pl-4 pr-4 text-gray-400 hover:text-gray-200 transition-all duration-200 text-sm font-medium
+                        {{ request()->routeIs('tindakan.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
                         <span class="w-6"><i class="fa-solid fa-hammer"></i></span>
                         <span>Tindakan</span>
                     </a>
