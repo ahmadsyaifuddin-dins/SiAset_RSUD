@@ -2,14 +2,12 @@
 
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangGudangController;
+use App\Http\Controllers\InventarisController;
 use App\Http\Controllers\ProfileController;
-// Import Controller Master Data yang sudah dibuat
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Import Controller Transaksi (Nanti di-uncomment setelah file dibuat)
-// use App\Http\Controllers\InventarisController;
 // use App\Http\Controllers\GudangMasukController;
 // use App\Http\Controllers\GudangKeluarController;
 // use App\Http\Controllers\KerusakanController;
@@ -34,7 +32,7 @@ Route::get('/dashboard', function () {
 // Group Middleware Auth (Hanya yang login bisa akses)
 Route::middleware('auth')->group(function () {
 
-    // --- 1. PROFILE & USER ---
+    // 1. PROFILE & USER
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -43,7 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', UserController::class);
     Route::get('users', [UserController::class, 'index'])->name('users.index');
 
-    // --- 2. MASTER DATA (Sidebar: Master Data) ---
+    // 2. MASTER DATA (Sidebar: Master Data)
     // Prefix 'master' biar URL rapi: /master/ruangan, /master/barang
     Route::prefix('master')->group(function () {
         Route::resource('ruangan', RuanganController::class);
@@ -51,10 +49,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('barang-gudang', BarangGudangController::class); // BHP (Kertas, dll)
     });
 
-    // --- 3. INVENTARIS (Sidebar: Inventaris Barang) ---
-    // Nanti uncomment setelah controller dibuat:
-    // Route::resource('inventaris', InventarisController::class);
-
+    // 3. INVENTARIS (Sidebar: Inventaris Barang)
+    Route::resource('inventaris', InventarisController::class)->parameters([
+        'inventaris' => 'inventaris',
+    ]);
     // --- 4. GUDANG (Sidebar: Gudang) ---
     Route::prefix('gudang')->group(function () {
         // Stok Gudang (Lihat sisa stok) - Sebenarnya bisa pakai index-nya BarangGudangController

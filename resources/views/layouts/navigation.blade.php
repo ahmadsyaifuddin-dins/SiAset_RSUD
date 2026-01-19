@@ -77,7 +77,7 @@
         </div>
 
         <div>
-            <a href="#"
+            <a href="{{ route('inventaris.index') }}"
                 class="flex items-center w-full py-3 px-4 rounded-xl transition-all duration-200 
                {{ request()->routeIs('inventaris.*') ? 'menu-header-active' : 'text-gray-400 hover:text-white' }}">
                 <span class="w-8"><i class="fa-solid fa-clipboard-list text-lg"></i></span>
