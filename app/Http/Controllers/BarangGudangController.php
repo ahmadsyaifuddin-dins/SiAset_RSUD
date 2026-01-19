@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBarangGudangRequest;
+use App\Http\Requests\UpdateBarangGudangRequest;
 use App\Models\BarangGudang;
-use Illuminate\Http\Request;
 
 class BarangGudangController extends Controller
 {
@@ -19,17 +20,11 @@ class BarangGudangController extends Controller
         return view('master.gudang.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreBarangGudangRequest $request)
     {
-        $request->validate([
-            'nama_barang' => 'required|string|max:255',
-            'satuan' => 'required|string|max:50', // Pcs, Rim, Box
-            'stok_saat_ini' => 'required|integer|min:0', // Stok Awal
-        ]);
+        BarangGudang::create($request->validated());
 
-        BarangGudang::create($request->all());
-
-        return redirect()->route('barang-gudang.index')->with('success', 'Item Gudang berhasil dibuat!');
+        return redirect()->route('barang-gudang.index')->with('success', 'Item Gudang dibuat!');
     }
 
     public function edit(BarangGudang $barangGudang)
@@ -37,16 +32,9 @@ class BarangGudangController extends Controller
         return view('master.gudang.edit', compact('barangGudang'));
     }
 
-    public function update(Request $request, BarangGudang $barangGudang)
+    public function update(UpdateBarangGudangRequest $request, BarangGudang $barangGudang)
     {
-        $request->validate([
-            'nama_barang' => 'required|string|max:255',
-            'satuan' => 'required|string|max:50',
-            // Stok biasanya tidak diedit disini, tapi kita buka aksesnya untuk koreksi admin
-            'stok_saat_ini' => 'required|integer|min:0',
-        ]);
-
-        $barangGudang->update($request->all());
+        $barangGudang->update($request->validated());
 
         return redirect()->route('barang-gudang.index')->with('success', 'Item Gudang diperbarui!');
     }
@@ -56,9 +44,9 @@ class BarangGudangController extends Controller
         try {
             $barangGudang->delete();
 
-            return redirect()->route('barang-gudang.index')->with('success', 'Item Gudang dihapus!');
+            return redirect()->route('barang-gudang.index')->with('success', 'Dihapus!');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal hapus! Item ini masih ada riwayat transaksinya.');
+            return redirect()->back()->with('error', 'Gagal! Item ini ada riwayat transaksinya.');
         }
     }
 }
