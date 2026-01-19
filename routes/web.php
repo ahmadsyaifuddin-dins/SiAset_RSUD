@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangGudangController;
+use App\Http\Controllers\BarangRusakController;
 use App\Http\Controllers\GudangKeluarController;
 use App\Http\Controllers\GudangMasukController;
 use App\Http\Controllers\InventarisController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\KerusakanController;
 use App\Http\Controllers\PerbaikanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RuanganController;
+use App\Http\Controllers\SerahTerimaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -90,8 +92,21 @@ Route::middleware('auth')->group(function () {
         Route::resource('tindakan', PerbaikanController::class);
     });
 
-    // --- 6. SERAH TERIMA & BARANG RUSAK (Sidebar: Bawah) ---
-    // Route::resource('barang-rusak', BarangRusakController::class);
+    //  6. SERAH TERIMA & BARANG RUSAK (Sidebar: Bawah)
+    // Barang Rusak Berat
+    Route::resource('barang-rusak', BarangRusakController::class)->names([
+        'index' => 'barang-rusak.index',
+        'create' => 'barang-rusak.create',
+        'store' => 'barang-rusak.store',
+        // 'destroy' tidak perlu karena ini log penghapusan
+    ]);
+
+    // Serah Terima
+    Route::resource('serah-terima', SerahTerimaController::class)->names([
+        'index' => 'serah-terima.index',
+        'create' => 'serah-terima.create',
+        'store' => 'serah-terima.store',
+    ]);
 
     // Laporan (Sidebar: Laporan)
     // Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');

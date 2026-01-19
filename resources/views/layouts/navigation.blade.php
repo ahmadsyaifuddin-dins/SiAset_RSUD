@@ -157,14 +157,16 @@
         </div>
 
         <div class="space-y-1 pt-2">
-            <a href="#"
-                class="flex items-center w-full py-3 px-4 rounded-xl transition-all duration-200 text-gray-400 hover:text-white">
+            <a href="{{ route('serah-terima.index') }}"
+                class="flex items-center w-full py-3 px-4 rounded-xl transition-all duration-200 text-gray-400 hover:text-white
+                {{ request()->routeIs('serah-terima.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
                 <span class="w-8"><i class="fa-solid fa-handshake text-lg"></i></span>
                 <span class="mx-1 text-sm font-medium">Serah Terima</span>
             </a>
 
-            <a href="#"
-                class="flex items-center w-full py-3 px-4 rounded-xl transition-all duration-200 text-gray-400 hover:text-white">
+            <a href="{{ route('barang-rusak.index') }}"
+                class="flex items-center w-full py-3 px-4 rounded-xl transition-all duration-200 text-gray-400 hover:text-white
+                {{ request()->routeIs('barang-rusak.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
                 <span class="w-8"><i class="fa-solid fa-circle-exclamation text-lg"></i></span>
                 <span class="mx-1 text-sm font-medium">Barang Rusak Berat</span>
             </a>
