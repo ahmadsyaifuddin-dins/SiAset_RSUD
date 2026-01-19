@@ -27,10 +27,10 @@
                         <td class="px-4 py-2">{{ $item->perbaikan->teknisi }}</td>
                         <td class="px-4 py-2">{{ $item->penerima }}</td>
                         <td class="px-4 py-2 text-center">
-                            <button class="text-blue-600 hover:text-blue-800"
-                                onclick="alert('Fitur Cetak PDF belum aktif')">
+                            <a href="{{ route('serah-terima.cetak', $item->id) }}" target="_blank"
+                                class="text-blue-600 hover:text-blue-800 transition" title="Cetak Berita Acara">
                                 <i class="fa-solid fa-print"></i> PDF
-                            </button>
+                            </a>
                         </td>
                     </tr>
                 @endforeach

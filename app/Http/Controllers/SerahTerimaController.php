@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSerahTerimaRequest;
 use App\Models\Perbaikan;
 use App\Models\SerahTerima;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SerahTerimaController extends Controller
 {
@@ -40,5 +41,19 @@ class SerahTerimaController extends Controller
         $perbaikan->kerusakan->inventaris->update(['kondisi' => 'Baik']);
 
         return redirect()->route('serah-terima.index')->with('success', 'Berita Acara Serah Terima berhasil dibuat!');
+    }
+
+    public function cetakPdf($id)
+    {
+        // Ambil data detail relasi sampai ke akar-akarnya
+        $data = SerahTerima::with(['perbaikan.kerusakan.inventaris.barang', 'perbaikan.kerusakan.inventaris.ruangan'])
+            ->findOrFail($id);
+
+        $pdf = Pdf::loadView('laporan.pdf.berita_acara', [
+            'data' => $data,
+            'judul' => 'BERITA ACARA SERAH TERIMA BARANG',
+        ]);
+
+        return $pdf->stream('BA_Serah_Terima_'.$data->id.'.pdf');
     }
 }

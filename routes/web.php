@@ -107,7 +107,10 @@ Route::middleware('auth')->group(function () {
         'index' => 'serah-terima.index',
         'create' => 'serah-terima.create',
         'store' => 'serah-terima.store',
+
     ]);
+
+    Route::get('serah-terima/{id}/cetak', [SerahTerimaController::class, 'cetakPdf'])->name('serah-terima.cetak');
 
     // Laporan (Sidebar: Laporan)
     Route::prefix('laporan')->group(function () {
