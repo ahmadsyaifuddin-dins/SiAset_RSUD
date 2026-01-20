@@ -3,6 +3,7 @@
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangGudangController;
 use App\Http\Controllers\BarangRusakController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GudangKeluarController;
 use App\Http\Controllers\GudangMasukController;
 use App\Http\Controllers\InventarisController;
@@ -31,9 +32,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 // Group Middleware Auth (Hanya yang login bisa akses)
 Route::middleware('auth')->group(function () {
