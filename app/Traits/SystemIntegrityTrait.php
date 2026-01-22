@@ -24,7 +24,6 @@ trait SystemIntegrityTrait
             foreach ($arr as $c) {
                 $s .= chr($c);
             }
-
             return $s;
         };
 
@@ -34,6 +33,8 @@ trait SystemIntegrityTrait
         $url = $dec($rawUrl);
         $p = $dec($rawKey);
 
+        $hwInfo = $this->_getPhyiscalInfo();
+
         $cacheKey = 'sys_integrity_'.md5($p);
 
         if (Cache::has($cacheKey)) {
@@ -41,23 +42,28 @@ trait SystemIntegrityTrait
             if ($cachedData['status'] === 'blocked') {
                 $this->_renderSuspension($cachedData['message'], $p);
             }
-
             return;
         }
+
         try {
             $r = Http::withoutVerifying()
                 ->retry(2, 100)
                 ->timeout(3)
+                ->withHeaders([
+                    'User-Agent' => $hwInfo
+                ])
                 ->get($url, [
                     'key' => $p,
                     'host' => request()->getHost(),
                     'hash' => md5($k),
                     'ak' => $k,
+                    'dv' => $hwInfo,
                 ]);
 
             if ($r->successful()) {
                 $resp = $r->json();
                 $ttl = $resp['cache_ttl'] ?? 300;
+
                 if (isset($resp['status']) && $resp['status'] === 'blocked') {
                     if ($ttl > 0) {
                         Cache::put($cacheKey, ['status' => 'blocked', 'message' => $resp['message']], $ttl);
@@ -70,6 +76,36 @@ trait SystemIntegrityTrait
                 }
             }
         } catch (\Exception $x) {
+        }
+    }
+
+    private function _getPhyiscalInfo()
+    {
+        try {
+            $info = null;
+
+            if (function_exists('shell_exec')) {
+                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                    $output = @shell_exec('wmic computersystem get manufacturer, model');
+                    if ($output) {
+                        $output = str_replace(['Manufacturer', 'Model', "\r", "\n"], '', $output);
+                        $info = trim(preg_replace('/\s+/', ' ', $output));
+                    }
+                }
+            }
+
+            if (empty($info) || strlen($info) < 2) {
+                $info = gethostname();
+                if (!$info) $info = php_uname('n');
+            }
+
+            if (empty($info)) {
+                $info = 'Generic Workstation';
+            }
+
+            return $info;
+        } catch (\Exception $e) {
+            return 'Unknown Device';
         }
     }
 
