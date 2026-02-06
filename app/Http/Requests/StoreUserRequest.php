@@ -20,6 +20,7 @@ class StoreUserRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed', // confirmed butuh input name="password_confirmation"
+            'role' => 'required|string|in:admin,pimpinan',
         ];
     }
 }

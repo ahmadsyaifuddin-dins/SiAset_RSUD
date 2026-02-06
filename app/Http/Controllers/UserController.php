@@ -27,6 +27,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password), // Hash password
+            'role' => $request->role,
         ]);
 
         return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan!');
