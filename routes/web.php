@@ -37,18 +37,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // 3. LAPORAN (Semua Role Bisa Akses)
+    // 3. PUSAT LAPORAN (Semua Role Bisa Akses)
     Route::prefix('laporan')->group(function () {
         Route::get('/', [LaporanController::class, 'index'])->name('laporan.index');
-        Route::get('/inventaris', [LaporanController::class, 'inventaris'])->name('laporan.inventaris');
+
+        // Gudang
         Route::get('/stok', [LaporanController::class, 'stokGudang'])->name('laporan.stok');
         Route::get('/masuk', [LaporanController::class, 'barangMasuk'])->name('laporan.masuk');
         Route::get('/keluar', [LaporanController::class, 'barangKeluar'])->name('laporan.keluar');
+
+        // Aset
+        Route::get('/inventaris', [LaporanController::class, 'inventaris'])->name('laporan.inventaris');
+        Route::get('/kerusakan', [LaporanController::class, 'kerusakan'])->name('laporan.kerusakan');
         Route::get('/perbaikan', [LaporanController::class, 'perbaikan'])->name('laporan.perbaikan');
+        Route::get('/pemusnahan', [LaporanController::class, 'pemusnahan'])->name('laporan.pemusnahan');
+        Route::get('/serah-terima', [LaporanController::class, 'serahTerima'])->name('laporan.serah-terima-rekap');
     });
 
     // 4. GUDANG KELUAR / PERMINTAAN BARANG (Admin & Kepala Ruangan)
-    // Kita letakkan di luar grup admin agar URL tetap /gudang/keluar
     Route::prefix('gudang')->group(function () {
         Route::resource('keluar', GudangKeluarController::class)->names([
             'index' => 'gudang-keluar.index',
@@ -62,9 +68,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('keluar/{id}/reject', [GudangKeluarController::class, 'reject'])->name('gudang-keluar.reject')->middleware('role:admin');
     });
 
-    // ==========================================================
     // KHUSUS ADMIN (Pimpinan & Kepala Ruangan TIDAK BISA Akses)
-    // ==========================================================
     Route::middleware(['role:admin'])->group(function () {
 
         // Manajemen User
@@ -82,6 +86,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'inventaris' => 'inventaris',
         ]);
 
+        // Cetak Label QR Code
         Route::get('inventaris/{id}/cetak-label', [InventarisController::class, 'cetakLabel'])->name('inventaris.label');
 
         // Gudang (Masuk & Stok Saja)
@@ -101,13 +106,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('tindakan', PerbaikanController::class);
         });
 
-        // Akhir Aset
+        // Akhir Aset (BAP & Serah Terima)
         Route::resource('barang-rusak', BarangRusakController::class)->names([
             'index' => 'barang-rusak.index',
             'create' => 'barang-rusak.create',
             'store' => 'barang-rusak.store',
         ]);
-
         Route::get('barang-rusak/{id}/bap', [BarangRusakController::class, 'cetakBap'])->name('barang-rusak.bap');
 
         Route::resource('serah-terima', SerahTerimaController::class)->names([
@@ -115,7 +119,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'create' => 'serah-terima.create',
             'store' => 'serah-terima.store',
         ]);
-
         Route::get('serah-terima/{id}/cetak', [SerahTerimaController::class, 'cetakPdf'])->name('serah-terima.cetak');
     });
 });

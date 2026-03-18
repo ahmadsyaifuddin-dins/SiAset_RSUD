@@ -18,26 +18,27 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th style="width: 5%">No</th>
-                <th style="width: 15%">Tanggal</th>
-                <th style="width: 25%">Nama Barang</th>
-                <th style="width: 20%">Tujuan Ruangan</th>
-                <th style="width: 15%">Pemohon</th>
-                <th style="width: 5%">Jml</th>
-                <th style="width: 15%">Keterangan</th>
+                <th>No</th>
+                <th>Tgl Dihapus</th>
+                <th>Kode / Nama Barang</th>
+                <th>Lokasi Terakhir</th>
+                <th>Penyetuju</th>
+                <th>Alasan Pemusnahan</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($data as $index => $item)
                 <tr>
                     <td style="text-align: center;">{{ $index + 1 }}</td>
-                    <td style="text-align: center;">{{ \Carbon\Carbon::parse($item->tanggal_keluar)->format('d-m-Y') }}
+                    <td style="text-align: center;">{{ \Carbon\Carbon::parse($item->tanggal_dihapus)->format('d-m-Y') }}
                     </td>
-                    <td>{{ $item->barangGudang->nama_barang ?? '-' }}</td>
+                    <td>
+                        <strong>{{ $item->kode_inventaris }}</strong><br>
+                        {{ $item->barang->nama_barang ?? '-' }}
+                    </td>
                     <td>{{ $item->ruangan->nama_ruangan ?? '-' }}</td>
-                    <td>{{ $item->user->name ?? 'Admin' }}</td>
-                    <td style="text-align: center;">{{ $item->jumlah_keluar }}</td>
-                    <td>{{ $item->keterangan }}</td>
+                    <td>{{ $item->nama_penyetuju }}</td>
+                    <td>{{ $item->alasan_hapus }}</td>
                 </tr>
             @endforeach
         </tbody>

@@ -11,7 +11,8 @@
     @include('laporan.components._header')
 
     <center>
-        <h3 style="margin-bottom: 20px; text-transform: uppercase;">{{ $judul }}</h3>
+        <h3 style="margin-bottom: 5px; text-transform: uppercase;">{{ $judul }}</h3>
+        <p style="margin-top: 0; margin-bottom: 20px; font-weight: bold;">LOKASI: {{ strtoupper($ruangan) }}</p>
     </center>
 
     <table class="data-table">
