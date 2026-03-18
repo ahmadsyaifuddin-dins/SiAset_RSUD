@@ -29,7 +29,7 @@ Route::get('/', function () {
 // GROUP AUTH (Semua user login bisa akses ini)
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // 1. DASHBOARD (Admin & Pimpinan Bisa Akses)
+    // 1. DASHBOARD (Admin, Pimpinan, Karu Bisa Akses)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // 2. PROFILE (Semua butuh ganti password/nama)
@@ -37,10 +37,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // 3. LAPORAN (Admin & Pimpinan Bisa Akses)
+    // 3. LAPORAN (Semua Role Bisa Akses)
     Route::prefix('laporan')->group(function () {
         Route::get('/', [LaporanController::class, 'index'])->name('laporan.index');
-        // Route untuk Cetak PDF
         Route::get('/inventaris', [LaporanController::class, 'inventaris'])->name('laporan.inventaris');
         Route::get('/stok', [LaporanController::class, 'stokGudang'])->name('laporan.stok');
         Route::get('/masuk', [LaporanController::class, 'barangMasuk'])->name('laporan.masuk');
@@ -48,8 +47,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/perbaikan', [LaporanController::class, 'perbaikan'])->name('laporan.perbaikan');
     });
 
+    // 4. GUDANG KELUAR / PERMINTAAN BARANG (Admin & Kepala Ruangan)
+    // Kita letakkan di luar grup admin agar URL tetap /gudang/keluar
+    Route::prefix('gudang')->group(function () {
+        Route::resource('keluar', GudangKeluarController::class)->names([
+            'index' => 'gudang-keluar.index',
+            'create' => 'gudang-keluar.create',
+            'store' => 'gudang-keluar.store',
+            'destroy' => 'gudang-keluar.destroy',
+        ]);
+
+        // Route Khusus Tombol ACC & Tolak (HANYA ADMIN)
+        Route::post('keluar/{id}/approve', [GudangKeluarController::class, 'approve'])->name('gudang-keluar.approve')->middleware('role:admin');
+        Route::post('keluar/{id}/reject', [GudangKeluarController::class, 'reject'])->name('gudang-keluar.reject')->middleware('role:admin');
+    });
+
     // ==========================================================
-    // KHUSUS ADMIN (Pimpinan TIDAK BISA Akses ke Bawah Ini)
+    // KHUSUS ADMIN (Pimpinan & Kepala Ruangan TIDAK BISA Akses)
     // ==========================================================
     Route::middleware(['role:admin'])->group(function () {
 
@@ -68,7 +82,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'inventaris' => 'inventaris',
         ]);
 
-        // Gudang
+        Route::get('inventaris/{id}/cetak-label', [InventarisController::class, 'cetakLabel'])->name('inventaris.label');
+
+        // Gudang (Masuk & Stok Saja)
         Route::prefix('gudang')->group(function () {
             Route::get('stok', [BarangGudangController::class, 'index'])->name('gudang.stok');
             Route::resource('masuk', GudangMasukController::class)->names([
@@ -76,12 +92,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 'create' => 'gudang-masuk.create',
                 'store' => 'gudang-masuk.store',
                 'destroy' => 'gudang-masuk.destroy',
-            ]);
-            Route::resource('keluar', GudangKeluarController::class)->names([
-                'index' => 'gudang-keluar.index',
-                'create' => 'gudang-keluar.create',
-                'store' => 'gudang-keluar.store',
-                'destroy' => 'gudang-keluar.destroy',
             ]);
         });
 
@@ -97,6 +107,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'create' => 'barang-rusak.create',
             'store' => 'barang-rusak.store',
         ]);
+
+        Route::get('barang-rusak/{id}/bap', [BarangRusakController::class, 'cetakBap'])->name('barang-rusak.bap');
 
         Route::resource('serah-terima', SerahTerimaController::class)->names([
             'index' => 'serah-terima.index',

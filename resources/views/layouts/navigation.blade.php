@@ -14,7 +14,7 @@
 
             <span
                 class="text-xs text-indigo-400 uppercase tracking-widest border border-indigo-500/30 px-2 py-0.5 rounded-full">
-                {{ Auth::user()->role }}
+                {{ str_replace('_', ' ', Auth::user()->role) }}
             </span>
         </div>
     </div>
@@ -56,7 +56,7 @@
                     <div class="relative pl-2">
                         <a href="{{ route('barang.index') }}"
                             class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium {{ request()->routeIs('barang.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
-                            <span class="w-6"><i class="fa-solid fa-box"></i></span><span>Barang</span>
+                            <span class="w-6"><i class="fa-solid fa-box"></i></span><span>Barang Aset</span>
                         </a>
                     </div>
                     <div class="relative pl-2">
@@ -77,38 +77,52 @@
                     <span class="mx-1 text-sm font-medium">Inventaris Barang</span>
                 </a>
             </div>
+        @endif
 
+
+        @if (in_array(auth()->user()->role, ['admin', 'kepala_ruangan']))
             <div x-data="{ open: {{ request()->is('gudang*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                     class="flex items-center w-full py-3 px-4 transition-all duration-300 group rounded-xl relative"
                     :class="open ? 'menu-header-active shadow-lg shadow-indigo-500/30' : 'text-gray-400 hover:text-white'">
                     <span class="w-8 relative z-10"><i class="fa-solid fa-warehouse text-lg"></i></span>
-                    <span class="mx-1 text-sm font-medium relative z-10">Gudang</span>
+                    <span class="mx-1 text-sm font-medium relative z-10">Gudang BHP</span>
                     <i class="fa-solid fa-chevron-down text-xs ml-auto transition-transform duration-300 relative z-10"
                         :class="{ 'rotate-180': open }"></i>
                 </button>
                 <div x-show="open" x-collapse class="mt-2 ml-4 pl-0 border-l-2 border-gray-700 space-y-1">
-                    <div class="relative pl-2">
-                        <a href="{{ route('gudang.stok') }}"
-                            class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium {{ request()->routeIs('gudang.stok') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
-                            <span class="w-6"><i class="fa-solid fa-layer-group"></i></span><span>Stok Gudang</span>
-                        </a>
-                    </div>
-                    <div class="relative pl-2">
-                        <a href="{{ route('gudang-masuk.index') }}"
-                            class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium {{ request()->routeIs('gudang-masuk.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
-                            <span class="w-6"><i class="fa-solid fa-download"></i></span><span>Barang Masuk</span>
-                        </a>
-                    </div>
+
+                    @if (auth()->user()->role === 'admin')
+                        <div class="relative pl-2">
+                            <a href="{{ route('gudang.stok') }}"
+                                class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium {{ request()->routeIs('gudang.stok') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
+                                <span class="w-6"><i class="fa-solid fa-layer-group"></i></span><span>Stok
+                                    Gudang</span>
+                            </a>
+                        </div>
+                        <div class="relative pl-2">
+                            <a href="{{ route('gudang-masuk.index') }}"
+                                class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium {{ request()->routeIs('gudang-masuk.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
+                                <span class="w-6"><i class="fa-solid fa-download"></i></span><span>Barang Masuk
+                                    (Restock)</span>
+                            </a>
+                        </div>
+                    @endif
+
                     <div class="relative pl-2">
                         <a href="{{ route('gudang-keluar.index') }}"
                             class="flex items-center py-3 pl-4 pr-4 transition-all duration-200 text-sm font-medium {{ request()->routeIs('gudang-keluar.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
-                            <span class="w-6"><i class="fa-solid fa-upload"></i></span><span>Barang Keluar</span>
+                            <span class="w-6"><i class="fa-solid fa-upload"></i></span>
+                            <span>{{ auth()->user()->role === 'admin' ? 'Distribusi / ACC' : 'Permintaan Barang' }}</span>
                         </a>
                     </div>
+
                 </div>
             </div>
+        @endif
 
+
+        @if (auth()->user()->role === 'admin')
             <div x-data="{ open: {{ request()->is('perbaikan*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                     class="flex items-center w-full py-3 px-4 transition-all duration-300 group rounded-xl relative"
@@ -122,13 +136,13 @@
                     <div class="relative pl-2">
                         <a href="{{ route('kerusakan.index') }}"
                             class="flex items-center py-3 pl-4 pr-4 text-gray-400 hover:text-gray-200 transition-all duration-200 text-sm font-medium {{ request()->routeIs('kerusakan.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
-                            <span class="w-6"><i class="fa-solid fa-rotate"></i></span><span>Permintaan</span>
+                            <span class="w-6"><i class="fa-solid fa-rotate"></i></span><span>Permintaan Servis</span>
                         </a>
                     </div>
                     <div class="relative pl-2">
                         <a href="{{ route('tindakan.index') }}"
                             class="flex items-center py-3 pl-4 pr-4 text-gray-400 hover:text-gray-200 transition-all duration-200 text-sm font-medium {{ request()->routeIs('tindakan.*') ? 'fluid-active' : 'text-gray-400 hover:text-gray-200' }}">
-                            <span class="w-6"><i class="fa-solid fa-hammer"></i></span><span>Tindakan</span>
+                            <span class="w-6"><i class="fa-solid fa-hammer"></i></span><span>Tindakan Teknisi</span>
                         </a>
                     </div>
                 </div>
@@ -148,6 +162,8 @@
                 </a>
             </div>
         @endif
+
+
         <div class="pt-2">
             <a href="{{ route('laporan.index') }}"
                 class="flex items-center w-full py-3 px-4 rounded-xl transition-all duration-200 

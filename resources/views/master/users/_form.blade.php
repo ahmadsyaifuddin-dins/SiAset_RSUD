@@ -12,6 +12,8 @@
             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             <option value="admin" {{ isset($user) && $user->role == 'admin' ? 'selected' : '' }}>Admin (Full Akses)
             </option>
+            <option value="kepala_ruangan" {{ isset($user) && $user->role == 'kepala_ruangan' ? 'selected' : '' }}>
+                Kepala Ruangan (Request BHP)</option>
             <option value="pimpinan" {{ isset($user) && $user->role == 'pimpinan' ? 'selected' : '' }}>Pimpinan (Hanya
                 Laporan)</option>
         </select>

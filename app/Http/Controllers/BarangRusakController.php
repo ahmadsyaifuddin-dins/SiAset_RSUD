@@ -2,53 +2,60 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreBarangRusakRequest;
-use App\Models\BarangRusak;
 use App\Models\Inventaris;
-use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 
 class BarangRusakController extends Controller
 {
+    // 1. Tampilkan daftar aset yang sudah berstatus "Dimusnahkan"
     public function index()
     {
-        // Load data barang rusak beserta detail asetnya (soft delete logic manual)
-        // Karena inventarisnya nanti dihapus, kita harus hati-hati.
-        // Best practice: Data inventaris jangan di-hard delete, tapi di-replicate atau disimpan history-nya.
-        // TAPI untuk simpelnya Project PKL: Kita simpan snapshot datanya di keterangan atau biarkan relasi putus (set null).
-
-        // REVISI LOGIC: Agar aman, kita ambil data BarangRusak yang punya relasi Inventaris (sebelum dihapus)
-        // Atau lebih baik: Jangan hapus data inventaris, tapi ubah status/kondisi jadi 'Musnah'.
-
-        $barangRusak = BarangRusak::with(['inventaris.barang', 'inventaris.ruangan'])->latest()->get();
+        $barangRusak = Inventaris::with(['barang', 'ruangan'])
+            ->where('status_aset', 'Dimusnahkan')
+            ->latest('tanggal_dihapus')
+            ->get();
 
         return view('barang_rusak.index', compact('barangRusak'));
     }
 
-    public function create()
+    // 2. Proses eksekusi pemusnahan (Akan dipanggil dari Modal di menu Inventaris)
+    public function store(Request $request)
     {
-        // Tampilkan barang yang kondisinya 'Rusak Berat' saja
-        $inventaris = Inventaris::with(['barang', 'ruangan'])
-            ->where('kondisi', 'Rusak Berat')
-            ->get();
+        $request->validate([
+            'inventaris_id' => 'required|exists:inventaris,id',
+            'alasan_hapus' => 'required|string',
+            'nama_penyetuju' => 'required|string',
+        ]);
 
-        return view('barang_rusak.create', compact('inventaris'));
+        $inventaris = Inventaris::findOrFail($request->inventaris_id);
+
+        // Soft Delete (Update Status)
+        $inventaris->update([
+            'status_aset' => 'Dimusnahkan',
+            'alasan_hapus' => $request->alasan_hapus,
+            'nama_penyetuju' => $request->nama_penyetuju,
+            'tanggal_dihapus' => now()->toDateString(),
+            'kondisi' => 'Rusak Berat', // Pastikan kondisinya dikunci
+        ]);
+
+        return redirect()->back()->with('success', 'Aset berhasil dimusnahkan dan masuk ke daftar Arsip BAP.');
     }
 
-    public function store(StoreBarangRusakRequest $request)
+    // 3. Cetak PDF Berita Acara Pemusnahan (BAP)
+    public function cetakBap($id)
     {
-        DB::transaction(function () use ($request) {
-            // 1. Simpan ke tabel arsip Barang Rusak
-            BarangRusak::create($request->validated());
+        $data = Inventaris::with(['barang', 'ruangan'])->findOrFail($id);
 
-            // 2. Hapus dari Inventaris Aktif (Hard Delete sesuai request "Penghapusan")
-            // Note: Kalau dihapus, relasi di BarangRusak jadi null jika tidak cascade.
-            // Solusi Project PKL: Biarkan data inventaris ada, tapi update kondisi jadi 'DIHAPUS'
+        $pdf = Pdf::loadView('laporan.pdf.bap', [
+            'data' => $data,
+            'judul' => 'BERITA ACARA PEMUSNAHAN BARANG ASET',
+        ]);
 
-            $asset = Inventaris::find($request->inventaris_id);
-            $asset->update(['kondisi' => 'DIHAPUS']); // Tandai saja biar history terjaga
-            // $asset->delete(); // Jangan di-delete biar laporan tidak error
-        });
+        // Bersihkan karakter '/' atau '\' dari kode inventaris agar bisa jadi nama file
+        $safeKode = str_replace(['/', '\\'], '-', $data->kode_inventaris);
 
-        return redirect()->route('barang-rusak.index')->with('success', 'Aset berhasil dihapus dari daftar aktif!');
+        // Nanti nama filenya jadi misal: BAP_Aset_INV-2026-IGD-001.pdf
+        return $pdf->stream('BAP_Aset_'.$safeKode.'.pdf');
     }
 }

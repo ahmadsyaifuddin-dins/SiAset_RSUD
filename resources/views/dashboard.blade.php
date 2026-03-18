@@ -8,6 +8,53 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            @if (auth()->user()->role === 'admin')
+                @if ($permintaanPending > 0 || $stokKritisCount > 0)
+                    <div class="mb-8 space-y-4 animate-fade-in-up">
+
+                        @if ($permintaanPending > 0)
+                            <a href="{{ route('gudang-keluar.index') }}"
+                                class="flex items-center justify-between p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg shadow-sm hover:bg-blue-100 hover:shadow-md transition group">
+                                <div class="flex items-center">
+                                    <div class="p-2 bg-blue-100 rounded-full mr-4 group-hover:scale-110 transition">
+                                        <i class="fa-solid fa-file-signature text-blue-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-base font-bold text-blue-800">Tindakan Diperlukan: Persetujuan
+                                            Distribusi</h4>
+                                        <p class="text-sm text-blue-700 mt-0.5">Ada <strong
+                                                class="text-lg">{{ $permintaanPending }}</strong> Permintaan Barang BHP
+                                            dari Kepala Ruangan yang menunggu ACC Anda.</p>
+                                    </div>
+                                </div>
+                                <i
+                                    class="fa-solid fa-arrow-right text-blue-500 text-xl transform group-hover:translate-x-1 transition"></i>
+                            </a>
+                        @endif
+
+                        @if ($stokKritisCount > 0)
+                            <a href="{{ route('gudang.stok') }}"
+                                class="flex items-center justify-between p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-sm hover:bg-red-100 hover:shadow-md transition group">
+                                <div class="flex items-center">
+                                    <div class="p-2 bg-red-100 rounded-full mr-4 group-hover:scale-110 transition">
+                                        <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-base font-bold text-red-800">Peringatan: Stok Barang Hampir
+                                            Habis!</h4>
+                                        <p class="text-sm text-red-700 mt-0.5">Ada <strong
+                                                class="text-lg">{{ $stokKritisCount }}</strong> Barang Gudang yang
+                                            stoknya tersisa 5 atau kurang. Segera lakukan pengadaan/restock.</p>
+                                    </div>
+                                </div>
+                                <i
+                                    class="fa-solid fa-arrow-right text-red-500 text-xl transform group-hover:translate-x-1 transition"></i>
+                            </a>
+                        @endif
+
+                    </div>
+                @endif
+            @endif
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
                 <div
@@ -172,7 +219,8 @@
                     </a>
                     <a href="{{ route('gudang-keluar.create') }}"
                         class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition text-center group border hover:border-indigo-500">
-                        <i class="fa-solid fa-dolly text-3xl text-indigo-500 mb-2 group-hover:scale-110 transition"></i>
+                        <i
+                            class="fa-solid fa-dolly text-3xl text-indigo-500 mb-2 group-hover:scale-110 transition"></i>
                         <p class="font-medium text-gray-700">Distribusi Barang</p>
                     </a>
                     <a href="{{ route('kerusakan.create') }}"
@@ -183,7 +231,8 @@
                     </a>
                     <a href="{{ route('laporan.index') }}"
                         class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition text-center group border hover:border-indigo-500">
-                        <i class="fa-solid fa-print text-3xl text-indigo-500 mb-2 group-hover:scale-110 transition"></i>
+                        <i
+                            class="fa-solid fa-print text-3xl text-indigo-500 mb-2 group-hover:scale-110 transition"></i>
                         <p class="font-medium text-gray-700">Cetak Laporan</p>
                     </a>
                 </div>

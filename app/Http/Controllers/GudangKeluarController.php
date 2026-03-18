@@ -11,14 +11,21 @@ class GudangKeluarController extends Controller
 {
     public function index()
     {
-        $riwayat = GudangKeluar::with(['barangGudang', 'ruangan'])->latest()->get();
+        $query = GudangKeluar::with(['barangGudang', 'ruangan', 'user'])->latest();
+
+        // Kepala Ruangan cuma bisa lihat permintaannya sendiri
+        if (auth()->user()->role === 'kepala_ruangan') {
+            $query->where('user_id', auth()->id());
+        }
+
+        $riwayat = $query->get();
 
         return view('master.gudang.keluar.index', compact('riwayat'));
     }
 
     public function create()
     {
-        $items = BarangGudang::where('stok_saat_ini', '>', 0)->get(); // Hanya tampilkan yg ada stoknya
+        $items = BarangGudang::where('stok_saat_ini', '>', 0)->get();
         $ruangans = Ruangan::all();
 
         return view('master.gudang.keluar.create', compact('items', 'ruangans'));
@@ -26,21 +33,55 @@ class GudangKeluarController extends Controller
 
     public function store(StoreGudangKeluarRequest $request)
     {
-        // Validasi Manual Stok Cukup gak? (Observer juga handle, tapi ini double check biar UX bagus)
-        $barang = BarangGudang::find($request->barang_gudang_id);
-        if ($barang->stok_saat_ini < $request->jumlah_keluar) {
-            return back()->with('error', 'Stok tidak cukup! Sisa: '.$barang->stok_saat_ini);
+        $data = $request->validated();
+        $data['user_id'] = auth()->id();
+
+        // Logika Status: Jika Admin = Langsung ACC (1). Jika Kepala Ruangan = Nunggu (0).
+        $data['status'] = (auth()->user()->role === 'admin') ? 1 : 0;
+
+        // Cek stok khusus admin (karena langsung potong)
+        if ($data['status'] == 1) {
+            $barang = BarangGudang::find($request->barang_gudang_id);
+            if ($barang->stok_saat_ini < $request->jumlah_keluar) {
+                return back()->with('error', 'Stok tidak cukup! Sisa: '.$barang->stok_saat_ini);
+            }
         }
 
-        GudangKeluar::create($request->validated());
+        GudangKeluar::create($data);
 
-        return redirect()->route('gudang-keluar.index')->with('success', 'Barang berhasil didistribusikan!');
+        $msg = (auth()->user()->role === 'admin')
+                ? 'Barang berhasil didistribusikan!'
+                : 'Permintaan terkirim. Menunggu ACC dari Gudang.';
+
+        return redirect()->route('gudang-keluar.index')->with('success', $msg);
     }
 
     public function destroy(GudangKeluar $gudangKeluar)
     {
         $gudangKeluar->delete();
 
-        return redirect()->route('gudang-keluar.index')->with('success', 'Transaksi dibatalkan (Stok dikembalikan).');
+        return redirect()->route('gudang-keluar.index')->with('success', 'Transaksi dibatalkan.');
+    }
+
+    public function approve($id)
+    {
+        $keluar = GudangKeluar::findOrFail($id);
+
+        // Cek stok sekali lagi sebelum di-ACC biar aman
+        if ($keluar->barangGudang->stok_saat_ini < $keluar->jumlah_keluar) {
+            return back()->with('error', 'Gagal ACC! Stok tersisa tinggal: '.$keluar->barangGudang->stok_saat_ini);
+        }
+
+        $keluar->update(['status' => 1]); // Ini akan trigger Observer untuk potong stok
+
+        return back()->with('success', 'Permintaan disetujui, stok gudang otomatis terpotong.');
+    }
+
+    public function reject($id)
+    {
+        $keluar = GudangKeluar::findOrFail($id);
+        $keluar->update(['status' => 2]); // Status Ditolak
+
+        return back()->with('success', 'Permintaan telah ditolak.');
     }
 }

@@ -22,4 +22,10 @@ class GudangKeluar extends Model
     {
         return $this->belongsTo(Ruangan::class);
     }
+
+    // Tambahan relasi ke User (Pemohon)
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

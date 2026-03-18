@@ -12,8 +12,8 @@ class InventarisController extends Controller
 {
     public function index()
     {
-        // Load relasi barang dan ruangan biar tidak N+1 Problem (Loading lama)
-        $inventaris = Inventaris::with(['barang', 'ruangan'])->latest()->get();
+        // HANYA tampilkan yang masih aktif
+        $inventaris = Inventaris::with(['barang', 'ruangan'])->where('status_aset', 'Aktif')->latest()->get();
 
         return view('inventaris.index', compact('inventaris'));
     }
@@ -54,5 +54,13 @@ class InventarisController extends Controller
         $inventaris->delete();
 
         return redirect()->route('inventaris.index')->with('success', 'Data dihapus!');
+    }
+
+    public function cetakLabel($id)
+    {
+        $data = Inventaris::with(['barang', 'ruangan'])->findOrFail($id);
+
+        // Kita return ke view khusus cetak HTML (bukan PDF) agar lebih presisi untuk ukuran kertas stiker
+        return view('inventaris.label', compact('data'));
     }
 }
