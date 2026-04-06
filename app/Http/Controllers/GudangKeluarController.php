@@ -56,8 +56,10 @@ class GudangKeluarController extends Controller
         return redirect()->route('gudang-keluar.index')->with('success', $msg);
     }
 
-    public function destroy(GudangKeluar $gudangKeluar)
+    public function destroy($id)
     {
+        // Cari data berdasarkan ID, lalu hapus
+        $gudangKeluar = GudangKeluar::findOrFail($id);
         $gudangKeluar->delete();
 
         return redirect()->route('gudang-keluar.index')->with('success', 'Transaksi dibatalkan.');
